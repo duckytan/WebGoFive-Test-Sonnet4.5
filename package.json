@@ -1,0 +1,32 @@
+{
+  "name": "h5-gomoku-v2",
+  "version": "2.0.0",
+  "description": "HTML5 Gomoku Game - Refactored Version",
+  "type": "module",
+  "scripts": {
+    "dev": "npx http-server -p 8080 -c-1",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint js/**/*.js",
+    "format": "prettier --write \"**/*.{js,html,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,html,css,md}\""
+  },
+  "keywords": [
+    "gomoku",
+    "five-in-a-row",
+    "canvas",
+    "game",
+    "ai"
+  ],
+  "author": "Project Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "vitest": "^1.0.4",
+    "canvas": "^2.11.2",
+    "jsdom": "^23.0.1"
+  }
+}
