@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>五子棋 H5 - Gomoku Game v2.0</title>
+    <meta name="description" content="HTML5 Canvas 五子棋游戏，支持 PvP/PvE/EvE 模式" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🎮 五子棋游戏</h1>
+        <div class="version">v2.0.0</div>
+      </header>
+
+      <main class="game-container">
+        <aside class="control-panel">
+          <section class="info-section">
+            <h3>游戏信息</h3>
+            <div class="info-item">
+              <label>当前玩家：</label>
+              <span id="current-player" class="player-black">⚫ 黑方</span>
+            </div>
+            <div class="info-item">
+              <label>游戏模式：</label>
+              <span id="game-mode">玩家对战</span>
+            </div>
+            <div class="info-item">
+              <label>步数：</label>
+              <span id="move-count">0</span>
+            </div>
+            <div class="info-item">
+              <label>用时：</label>
+              <span id="game-time">00:00</span>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h3>游戏控制</h3>
+
+            <div class="control-group">
+              <label for="select-mode">模式：</label>
+              <select id="select-mode">
+                <option value="PvP">玩家对战 (PvP)</option>
+                <option value="PvE">人机对战 (PvE)</option>
+                <option value="EvE">机机对战 (EvE)</option>
+              </select>
+            </div>
+
+            <div class="control-group" id="difficulty-group" style="display: none">
+              <label for="select-difficulty">难度：</label>
+              <select id="select-difficulty">
+                <option value="BEGINNER">新手</option>
+                <option value="NORMAL" selected>正常</option>
+                <option value="HARD">困难</option>
+                <option value="HELL">地狱</option>
+              </select>
+            </div>
+
+            <div class="button-group">
+              <button id="btn-new-game" class="btn btn-primary">新游戏</button>
+              <button id="btn-undo" class="btn btn-secondary">悔棋</button>
+              <button id="btn-hint" class="btn btn-secondary">提示</button>
+            </div>
+
+            <div class="button-group">
+              <button id="btn-save" class="btn btn-tertiary">保存</button>
+              <button id="btn-load" class="btn btn-tertiary">加载</button>
+              <button id="btn-export" class="btn btn-tertiary">导出</button>
+            </div>
+          </section>
+
+          <section class="message-section">
+            <div id="message" class="message" style="display: none"></div>
+          </section>
+        </aside>
+
+        <section class="board-section">
+          <canvas id="game-canvas"></canvas>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          使用方向键或鼠标操作 | 支持禁手规则 | 四级 AI 难度<br />
+          <a href="doc/README.md" target="_blank">📖 查看文档</a>
+        </p>
+      </footer>
+    </div>
+
+    <!-- 加载顺序：工具 -> 核心 -> UI -> 服务 -> 应用 -> 入口 -->
+    <script src="js/utils/Logger.js"></script>
+    <script src="js/utils/EventBus.js"></script>
+    <script src="js/core/GameState.js"></script>
+    <script src="js/core/RuleEngine.js"></script>
+    <script src="js/core/CandidateGenerator.js"></script>
+    <script src="js/core/EvaluationService.js"></script>
+    <script src="js/core/AIEngine.js"></script>
+    <script src="js/ui/CanvasRenderer.js"></script>
+    <script src="js/ui/HudPanel.js"></script>
+    <script src="js/services/SaveLoadService.js"></script>
+    <script src="js/app/ModeManager.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
