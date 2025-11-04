@@ -36,6 +36,7 @@ class CanvasRenderer {
 
     this.initCanvas();
     this.setupEventListeners();
+    this.render();
   }
 
   /**

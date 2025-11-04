@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gomoku Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 20px auto;
+        }
+        .test-results {
+            list-style: none;
+            padding: 0;
+        }
+        .test-results li {
+            padding: 8px;
+            margin: 5px 0;
+            border-left: 4px solid #ccc;
+            background: #f9f9f9;
+        }
+        .test-results li.pass {
+            border-left-color: #28a745;
+        }
+        .test-results li.fail {
+            border-left-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-section">
+        <h1>🎮 五子棋游戏修复验证</h1>
+        <p>测试页面用于验证棋盘渲染和功能是否正常工作</p>
+    </div>
+
+    <div class="test-section">
+        <h2>初始化测试</h2>
+        <div id="init-status" class="status info">正在初始化...</div>
+        <ul id="test-results" class="test-results"></ul>
+    </div>
+
+    <div class="test-section">
+        <h2>棋盘渲染</h2>
+        <canvas id="game-canvas"></canvas>
+        <div id="canvas-info"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>游戏信息</h2>
+        <div style="padding: 10px; background: #f9f9f9; border-radius: 4px;">
+            <div style="margin: 5px 0;">当前玩家: <span id="current-player">-</span></div>
+            <div style="margin: 5px 0;">游戏模式: <span id="game-mode">-</span></div>
+            <div style="margin: 5px 0;">步数: <span id="move-count">-</span></div>
+            <div style="margin: 5px 0;">用时: <span id="game-time">-</span></div>
+        </div>
+        <div id="message" style="display:none;"></div>
+    </div>
+
+    <!-- Load modules -->
+    <script src="js/utils/Logger.js"></script>
+    <script src="js/utils/EventBus.js"></script>
+    <script src="js/core/GameState.js"></script>
+    <script src="js/core/RuleEngine.js"></script>
+    <script src="js/core/CandidateGenerator.js"></script>
+    <script src="js/core/EvaluationService.js"></script>
+    <script src="js/core/AIEngine.js"></script>
+    <script src="js/ui/CanvasRenderer.js"></script>
+    <script src="js/ui/HudPanel.js"></script>
+
+    <script>
+        const results = document.getElementById('test-results');
+        const initStatus = document.getElementById('init-status');
+        const canvasInfo = document.getElementById('canvas-info');
+
+        function addResult(message, passed) {
+            const li = document.createElement('li');
+            li.className = passed ? 'pass' : 'fail';
+            li.textContent = (passed ? '✓ ' : '✗ ') + message;
+            results.appendChild(li);
+            return passed;
+        }
+
+        function runTests() {
+            let allPassed = true;
+
+            try {
+                // Test 1: Check modules loaded
+                allPassed &= addResult('Logger 模块已加载', typeof Logger !== 'undefined');
+                allPassed &= addResult('EventBus 模块已加载', typeof EventBus !== 'undefined');
+                allPassed &= addResult('GameState 模块已加载', typeof GameState !== 'undefined');
+                allPassed &= addResult('RuleEngine 模块已加载', typeof RuleEngine !== 'undefined');
+                allPassed &= addResult('CanvasRenderer 模块已加载', typeof CanvasRenderer !== 'undefined');
+                allPassed &= addResult('HudPanel 模块已加载', typeof HudPanel !== 'undefined');
+
+                // Test 2: Create instances
+                const gameState = new GameState();
+                allPassed &= addResult('GameState 实例创建成功', gameState !== null);
+
+                const eventBus = new EventBus();
+                allPassed &= addResult('EventBus 实例创建成功', eventBus !== null);
+
+                const ruleEngine = new RuleEngine(gameState);
+                allPassed &= addResult('RuleEngine 实例创建成功', ruleEngine !== null);
+
+                const renderer = new CanvasRenderer('game-canvas', gameState, eventBus);
+                allPassed &= addResult('CanvasRenderer 实例创建成功', renderer !== null);
+
+                const hudPanel = new HudPanel(gameState, eventBus);
+                allPassed &= addResult('HudPanel 实例创建成功', hudPanel !== null);
+
+                // Test 3: Check canvas
+                const canvas = document.getElementById('game-canvas');
+                allPassed &= addResult('Canvas 元素存在', canvas !== null);
+                allPassed &= addResult('Canvas 宽度已设置 (' + canvas.width + 'px)', canvas.width > 0);
+                allPassed &= addResult('Canvas 高度已设置 (' + canvas.height + 'px)', canvas.height > 0);
+
+                // Check if canvas has been drawn
+                const ctx = canvas.getContext('2d');
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const hasPixels = imageData.data.some(v => v !== 0);
+                allPassed &= addResult('Canvas 已绘制内容', hasPixels);
+
+                canvasInfo.innerHTML = `
+                    <div class="status ${hasPixels ? 'success' : 'error'}">
+                        Canvas 尺寸: ${canvas.width} × ${canvas.height} 像素<br>
+                        ${hasPixels ? '✓ 棋盘已成功渲染！' : '✗ 棋盘未渲染'}
+                    </div>
+                `;
+
+                // Test 4: Check HUD updates
+                const currentPlayerEl = document.getElementById('current-player');
+                const gameModeEl = document.getElementById('game-mode');
+                const moveCountEl = document.getElementById('move-count');
+
+                allPassed &= addResult('当前玩家显示已更新', currentPlayerEl.textContent !== '-');
+                allPassed &= addResult('步数显示已更新', moveCountEl.textContent !== '-');
+
+                // Update status
+                if (allPassed) {
+                    initStatus.className = 'status success';
+                    initStatus.textContent = '✓ 所有测试通过！棋盘和功能正常工作。';
+                } else {
+                    initStatus.className = 'status error';
+                    initStatus.textContent = '✗ 部分测试失败，请检查控制台。';
+                }
+
+            } catch (error) {
+                initStatus.className = 'status error';
+                initStatus.textContent = '✗ 测试出错: ' + error.message;
+                addResult('发生异常: ' + error.message, false);
+                console.error('Test error:', error);
+            }
+        }
+
+        // Run tests after a short delay to ensure everything is loaded
+        setTimeout(runTests, 100);
+    </script>
+</body>
+</html>

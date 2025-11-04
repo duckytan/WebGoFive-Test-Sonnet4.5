@@ -17,6 +17,7 @@ class HudPanel {
 
     this.timerInterval = null;
     this.setupEventListeners();
+    this.updateDisplay();
   }
 
   /**
