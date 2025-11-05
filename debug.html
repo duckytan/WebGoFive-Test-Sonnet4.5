@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>五子棋调试</title>
+  <style>
+    body { margin: 20px; font-family: monospace; }
+    #game-canvas { border: 1px solid #ccc; margin: 20px 0; }
+    .log { margin: 10px 0; padding: 5px; background: #f5f5f5; }
+    .error { color: red; }
+    .success { color: green; }
+  </style>
+</head>
+<body>
+  <h1>五子棋调试页面</h1>
+  <div id="logs"></div>
+  <canvas id="game-canvas"></canvas>
+  
+  <script>
+    const logDiv = document.getElementById('logs');
+    function log(msg, type = 'info') {
+      const p = document.createElement('div');
+      p.className = 'log ' + type;
+      p.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+      logDiv.appendChild(p);
+      console.log(msg);
+    }
+    
+    window.addEventListener('error', (e) => {
+      log('ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno, 'error');
+    });
+    
+    log('页面加载开始');
+  </script>
+  
+  <script src="js/utils/Logger.js" onload="log('✓ Logger.js 加载', 'success')" onerror="log('✗ Logger.js 失败', 'error')"></script>
+  <script src="js/utils/EventBus.js" onload="log('✓ EventBus.js 加载', 'success')" onerror="log('✗ EventBus.js 失败', 'error')"></script>
+  <script src="js/core/GameState.js" onload="log('✓ GameState.js 加载', 'success')" onerror="log('✗ GameState.js 失败', 'error')"></script>
+  <script src="js/core/RuleEngine.js" onload="log('✓ RuleEngine.js 加载', 'success')" onerror="log('✗ RuleEngine.js 失败', 'error')"></script>
+  <script src="js/core/CandidateGenerator.js" onload="log('✓ CandidateGenerator.js 加载', 'success')" onerror="log('✗ CandidateGenerator.js 失败', 'error')"></script>
+  <script src="js/core/EvaluationService.js" onload="log('✓ EvaluationService.js 加载', 'success')" onerror="log('✗ EvaluationService.js 失败', 'error')"></script>
+  <script src="js/core/AIEngine.js" onload="log('✓ AIEngine.js 加载', 'success')" onerror="log('✗ AIEngine.js 失败', 'error')"></script>
+  <script src="js/ui/CanvasRenderer.js" onload="log('✓ CanvasRenderer.js 加载', 'success')" onerror="log('✗ CanvasRenderer.js 失败', 'error')"></script>
+  <script src="js/ui/HudPanel.js" onload="log('✓ HudPanel.js 加载', 'success')" onerror="log('✗ HudPanel.js 失败', 'error')"></script>
+  <script src="js/services/SaveLoadService.js" onload="log('✓ SaveLoadService.js 加载', 'success')" onerror="log('✗ SaveLoadService.js 失败', 'error')"></script>
+  <script src="js/app/ModeManager.js" onload="log('✓ ModeManager.js 加载', 'success')" onerror="log('✗ ModeManager.js 失败', 'error')"></script>
+  
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      log('DOMContentLoaded 触发');
+      
+      try {
+        log('开始初始化...');
+        
+        const eventBus = new EventBus();
+        log('✓ EventBus 创建成功');
+        
+        const gameState = new GameState();
+        log('✓ GameState 创建成功，boardSize=' + gameState.boardSize);
+        
+        const canvas = document.getElementById('game-canvas');
+        log('Canvas 元素: ' + (canvas ? '存在' : '不存在'));
+        
+        if (canvas) {
+          const renderer = new CanvasRenderer('game-canvas', gameState, eventBus);
+          log('✓ CanvasRenderer 创建成功');
+          log('Canvas 尺寸: ' + canvas.width + 'x' + canvas.height);
+          
+          log('调用 render()...');
+          renderer.render();
+          log('✓ render() 完成', 'success');
+        }
+        
+      } catch (error) {
+        log('初始化错误: ' + error.message, 'error');
+        log('Stack: ' + error.stack, 'error');
+      }
+    });
+  </script>
+</body>
+</html>

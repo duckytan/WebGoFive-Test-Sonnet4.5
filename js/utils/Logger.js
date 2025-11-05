@@ -87,5 +87,5 @@ if (typeof window !== 'undefined') {
   );
 }
 
-// 支持 ES Module
+// 支持 ES Module (仅用于测试环境)
 export default Logger;
